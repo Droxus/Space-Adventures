@@ -6,4 +6,7 @@ export class Graphic {
         const { material, geometry } = params;
         this.node = new Mesh(geometry, material);
     }
+    public getNode(): Object3D {
+        return this.node;
+    }
 }
