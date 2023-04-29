@@ -19,4 +19,7 @@ export class World extends Group {
         this.add(this.mainGroup = mainGroup);
         this.add(this.hudGroup = hudGroup);
     }
+    public getMainGroup(): Group {
+        return this.mainGroup;
+    }
 }
