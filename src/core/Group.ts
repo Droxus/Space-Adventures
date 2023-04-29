@@ -20,7 +20,7 @@ export class Group extends Graphic {
     }
     /**
      * Access the children of this node.
-     * @returns the list (in the order of addtion) of all the children nodes in this group node
+     * @returns the list (in the order of addition) of all the children nodes in this group node
      */
     public getChildren(): Graphic[] {
         return this.children;
