@@ -11,15 +11,18 @@ enum StateFlag {
 }
 
 export class Game {
-    private domElement: HTMLElement;
+    private domElement: HTMLCanvasElement;
     private controls: Controls;
     private view: View;
     private world: World;
     private state: StateFlag
     private domElementSizeObserver: ResizeObserver;
+    private animationRequestId: any;
+    private needRender: boolean;
     constructor() {
         this.state = StateFlag.NONE;
-        this.domElement = document.querySelector<HTMLElement>('#canvas') ??
+        this.needRender = false;
+        this.domElement = document.querySelector<HTMLCanvasElement>('#canvas') ??
             document.body.appendChild(document.createElement('canvas'));
         this.controls = Factory.createControls();
         this.view = Factory.createView({ domElement: this.domElement, controls: this.controls });
@@ -30,9 +33,11 @@ export class Game {
         this.state = StateFlag.STARTED;
         this._initScene();
         this._observeDomElementSizeChange();
+        this._animate();
     }
     public end(): void {
         this.state = StateFlag.ENDED;
+        this._disanimate();
         this._unobserveDomElementSizeChange();
         this._destroyScene();
     }
@@ -42,7 +47,7 @@ export class Game {
         const box = Factory.createBox({ geometry: boxGeometry, material: boxMaterial })
         this.world.getMainGroup().add(box);
         this.controls.getCamera().position.z = 5;
-        this.view.render(this.world);
+        this.needRender = true;
     }
     /** @todo implement */
     private _destroyScene(): void {
@@ -61,6 +66,17 @@ export class Game {
         let height = boxSize?.blockSize ?? contentRect.height;
         width = Math.round(width * dpr);
         height = Math.round(height * dpr);
-        this.view.setSize({ width, height });
+        const needResize = this.domElement.width !== width || this.domElement.height !== height;
+        needResize && this.view.setSize({ width, height });
+        needResize && this.controls.update({ viewport: { width, height } });
+        this.needRender = needResize;
+    }
+    private _animate(): void {
+        this.needRender && this.view.render(this.world);
+        this.needRender = false;
+        this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
+    }
+    private _disanimate(): void {
+        this.animationRequestId && cancelAnimationFrame(this.animationRequestId);
     }
 }
