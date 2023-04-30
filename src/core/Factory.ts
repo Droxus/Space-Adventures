@@ -30,6 +30,12 @@ export class Factory {
         const material = new THREE.MeshBasicMaterial( { color } );
         return new Graphic({ material, geometry });
     }
+    public static createSphere(params: { material: { color: string | number }; geometry: {radius: number, width: number, height: number} }){
+        const { material: { color }, geometry: { radius, width, height }} = params;
+        const geometry = new THREE.SphereGeometry(radius, width, height);
+        const material = new THREE.MeshBasicMaterial( { color } );
+        return new Graphic({ material, geometry });
+    }
     public static createGroup(): Group {
         return new Group();
     }

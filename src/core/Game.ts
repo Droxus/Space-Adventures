@@ -45,9 +45,23 @@ export class Game {
         const boxGeometry = { width: 1, height: 1, depth: 1 };
         const boxMaterial = { color: 0x00ff00 };
         const box = Factory.createBox({ geometry: boxGeometry, material: boxMaterial })
+        this._createPlanetarySystem({x: 0, y: 0, z: 0}, 5)
         this.world.getMainGroup().add(box);
-        this.controls.getCamera().position.z = 5;
+        box.getNode().position.set(5, 5, 0)
+        this.controls.getCamera().position.z = 10;
         this.needRender = true;
+    }
+    private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
+        // mother star creating
+        const star = Factory.createSphere({ geometry: { radius: 1, width: 32, height: 16 }, material: { color: 0xfff000 } })
+        this.world.getMainGroup().add(star);
+        star.getNode().position.set(center.x, center.y, center.z)
+        // creating planets
+        for (let i = 0; i < planetsNumber; i++){
+            const planet = Factory.createSphere({ geometry: { radius: 0.5, width: 32, height: 16 }, material: { color: 0xffff0 } })
+            this.world.getMainGroup().add(planet);
+            planet.getNode().position.set(center.x + i * 2 + 3, center.y, center.z)
+        }
     }
     /** @todo implement */
     private _destroyScene(): void {
