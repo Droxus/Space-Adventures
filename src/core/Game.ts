@@ -16,8 +16,11 @@ export class Game {
     private view: View;
     private world: World;
     private state: StateFlag
+    /** holds a reference to a listener of the {@link domElement} size change events */
     private domElementSizeObserver: ResizeObserver;
+    /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
     private animationRequestId: any;
+    /** tells the game loop whether its scene needs to be re-rendered (true) or not */
     private needRender: boolean;
     constructor() {
         this.state = StateFlag.NONE;
@@ -28,18 +31,27 @@ export class Game {
         this.world = Factory.createWorld();
         this.domElementSizeObserver = new ResizeObserver(this._onDomElementSizeChanged.bind(this));
     }
+    /**
+     * Starts the game with an initial setup, such as a spawn point, a level, a player, etc. 
+     */
     public start() {
         this.state = StateFlag.STARTED;
         this._initScene();
         this._observeDomElementSizeChange();
         this._animate();
     }
+    /**
+     * Ends the game by terminating its animation process, disposing the game resources, etc.
+     */
     public end(): void {
         this.state = StateFlag.ENDED;
         this._disanimate();
         this._unobserveDomElementSizeChange();
         this._destroyScene();
     }
+    /**
+     * This game's initial setup of the scene graph.
+     */
     private _initScene(): void {
         const boxGeometry = { width: 1, height: 1, depth: 1 };
         const boxMaterial = { color: 0x00ff00 };
@@ -62,7 +74,16 @@ export class Game {
             planet.getNode().position.set(center.x + i * 2 + 3, center.y, center.z)
         }
     }
-    /** @todo implement */
+    /**
+     * Describes the steps to efficiently dispose the resources, such as
+     * closing websockets, ports,
+     * revoking network requests,
+     * stopping requests sent through {@link setTimeout}, {@link setInterval}, or {@link requestAnimationFrame}
+     * removing listeners from any models events,
+     * unsubscribing from any change subscriptions,
+     * freeing GPU memory by disposing {@link THREE.Material}s and their textures,
+     * cleaning up {@link localStorage},
+     */
     private _destroyScene(): void {
         // TODO
     }
@@ -72,6 +93,12 @@ export class Game {
     private _unobserveDomElementSizeChange(): void {
         this.domElementSizeObserver.unobserve(this.domElement);
     }
+    /**
+     * Tries updating {@link domElement} size
+     * according to the new dimensions passed as the arguments of this function.
+     *
+     * A callback for {@link domElementSizeObserver}
+     */
     private _onDomElementSizeChanged([{ devicePixelContentBoxSize, contentBoxSize, contentRect }]: ResizeObserverEntry[]): void {
         const dpr = devicePixelContentBoxSize ? 1 : window.devicePixelRatio;
         const boxSize = devicePixelContentBoxSize?.[0] ?? contentBoxSize?.[0] ?? contentBoxSize;
@@ -89,6 +116,10 @@ export class Game {
         this.needRender && this.view.render(this.world);
         this.needRender = false;
     }
+    /**
+     * Tries rendering the scene if there was any changes.
+     * A callback for {@link requestAnimationFrame}
+     */
     private _animate(): void {
         this._render();
         this.animationRequestId = requestAnimationFrame(this._animate.bind(this));

@@ -26,6 +26,11 @@ export class View {
     public render(object: Graphic): void {
         this.renderer.render(object.getNode(), this.controls.getCamera());
     }
+    /**
+     * Sets this view's viewport (a visible region of a web page and/or its element(s)) new size
+     * @param width a new width (in pixels)
+     * @param height a new height (in pixels)
+     */
     public setSize({ width, height }: { width: number, height: number }): void {
         this.renderer.domElement.width = width;
         this.renderer.domElement.height = height;
