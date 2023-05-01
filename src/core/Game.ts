@@ -22,8 +22,7 @@ export class Game {
     constructor() {
         this.state = StateFlag.NONE;
         this.needRender = false;
-        this.domElement = document.querySelector<HTMLCanvasElement>('#canvas') ??
-            document.body.appendChild(document.createElement('canvas'));
+        this.domElement = document.querySelector('#canvas') as HTMLCanvasElement;
         this.controls = Factory.createControls();
         this.view = Factory.createView({ domElement: this.domElement, controls: this.controls });
         this.world = Factory.createWorld();
@@ -84,10 +83,14 @@ export class Game {
         needResize && this.view.setSize({ width, height });
         needResize && this.controls.update({ viewport: { width, height } });
         this.needRender = needResize;
+        this._render();
     }
-    private _animate(): void {
+    private _render(): void {
         this.needRender && this.view.render(this.world);
         this.needRender = false;
+    }
+    private _animate(): void {
+        this._render();
         this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
     }
     private _disanimate(): void {
