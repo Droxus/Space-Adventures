@@ -27,6 +27,7 @@ export class View {
         this.renderer.render(object.getNode(), this.controls.getCamera());
     }
     public setSize({ width, height }: { width: number, height: number }): void {
-        this.renderer.setSize(width, height, true);
+        this.renderer.domElement.width = width;
+        this.renderer.domElement.height = height;
     }
 }
