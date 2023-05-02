@@ -32,7 +32,9 @@ export class View {
      * @param height a new height (in pixels)
      */
     public setSize({ width, height }: { width: number, height: number }): void {
-        this.renderer.domElement.width = width;
-        this.renderer.domElement.height = height;
+        // maybe setViewport() can solve the problem
+        this.renderer.setSize(width, height)
+        // this.renderer.domElement.width = width;
+        // this.renderer.domElement.height = height;
     }
 }
