@@ -12,4 +12,13 @@ export class Controls {
     public getCamera(): THREE.Camera {
         return this.camera;
     }
+    /**
+     * Update this controls within the {@link context} specified.
+     * @param context a context object to update the controls with
+     */
+    public update(context: { viewport: { width: number, height: number } }): void {
+        const { width, height } = context.viewport;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+    }
 }
