@@ -5,6 +5,7 @@ import { View } from "./View";
 import { Group } from "./Group";
 import { World } from "./World";
 import { Game } from "./Game";
+import { Vehicle } from "../sprites/Vehicle";
 
 /**
  * This class knows how to create an object of almost any type in the game.
@@ -18,22 +19,22 @@ import { Game } from "./Game";
  * + facilitate test suits.
  */
 export class Factory {
-    public static createView(props: { domElement?: HTMLElement, controls: Controls}): View {
+    public static createView(props: { domElement?: HTMLElement, controls: Controls }): View {
         return new View(props);
     }
     public static createControls(): Controls {
         return new Controls();
     }
-    public static createBox(params: { material: { color: string | number }; geometry: {width: number, height: number, depth: number} }): Graphic {
-        const { material: { color }, geometry: { width, height, depth }} = params;
+    public static createBox(params: { material: { color: string | number }; geometry: { width: number, height: number, depth: number } }): Graphic {
+        const { material: { color }, geometry: { width, height, depth } } = params;
         const geometry = new THREE.BoxGeometry(width, height, depth);
-        const material = new THREE.MeshBasicMaterial( { color } );
+        const material = new THREE.MeshBasicMaterial({ color });
         return new Graphic({ material, geometry });
     }
-    public static createSphere(params: { material: { color: string | number }; geometry: {radius: number, width: number, height: number} }){
-        const { material: { color }, geometry: { radius, width, height }} = params;
+    public static createSphere(params: { material: { color: string | number }; geometry: { radius: number, width: number, height: number } }) {
+        const { material: { color }, geometry: { radius, width, height } } = params;
         const geometry = new THREE.SphereGeometry(radius, width, height);
-        const material = new THREE.MeshBasicMaterial( { color } );
+        const material = new THREE.MeshBasicMaterial({ color });
         return new Graphic({ material, geometry });
     }
     public static createGroup(): Group {
@@ -51,5 +52,12 @@ export class Factory {
      */
     public static createGame(): Game {
         return new Game();
+    }
+    public static createVehicle(params: { size: number }): Vehicle {
+        const { size } = params;
+        const geometry = new THREE.CapsuleGeometry(size, 1, 4, 8);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const node = new THREE.Mesh(geometry, material);
+        return new Vehicle({ node });
     }
 }
