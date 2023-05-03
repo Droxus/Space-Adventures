@@ -32,7 +32,6 @@ export class View {
      * @param height a new height (in pixels)
      */
     public setSize({ width, height }: { width: number, height: number }): void {
-        this.renderer.domElement.width = width;
-        this.renderer.domElement.height = height;
+        this.renderer.setSize(width, height, false)
     }
 }
