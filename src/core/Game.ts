@@ -62,7 +62,7 @@ export class Game {
         const ship = Factory.createVehicle({ size: 20 });
         this.world.getMainGroup().add(ship);
         const [x,y,z] = Array.from(new Array(3), _ => Math.random() * factor);
-        ship.getNode().position.set(x,y,z);
+        ship.moveTo({x, y, z});
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
         let starSize = 5 + Math.ceil(Math.random() * 5)
