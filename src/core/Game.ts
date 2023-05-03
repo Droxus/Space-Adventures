@@ -59,19 +59,29 @@ export class Game {
         this._createPlanetarySystem({x: 0, y: 0, z: 0}, 5)
         this.world.getMainGroup().add(box);
         box.getNode().position.set(5, 5, 0)
-        this.controls.getCamera().position.z = 10;
+        this.controls.getCamera().position.z = 200;
         this.needRender = true;
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
+        let starSize = 5 + Math.ceil(Math.random() * 5)
         // mother star creating
-        const star = Factory.createSphere({ geometry: { radius: 1, width: 32, height: 16 }, material: { color: 0xfff000 } })
+        const star = Factory.createSphere({ geometry: { radius: starSize, width: 32, height: 16 }, material: { color: 0xfff000 } })
         this.world.getMainGroup().add(star);
         star.getNode().position.set(center.x, center.y, center.z)
         // creating planets
         for (let i = 0; i < planetsNumber; i++){
-            const planet = Factory.createSphere({ geometry: { radius: 0.5, width: 32, height: 16 }, material: { color: 0xffff0 } })
+            let planetSize = Math.ceil(Math.random() * 4)
+            const planet = Factory.createSphere({ geometry: { radius: planetSize, width: 32, height: 16 }, material: { color: 0xffff0 } })
             this.world.getMainGroup().add(planet);
-            planet.getNode().position.set(center.x + i * 2 + 3, center.y, center.z)
+            let betweenRandom = 10 + Math.ceil(Math.random() * 4)
+            let betweenDistance = i * (2 * betweenRandom + (starSize + planetSize) * 2)
+            let y = betweenDistance * (Math.random() - 0.5) * 2
+            // (x - center.x)^2 + (y - center.y)^2 = betweenDistance^2
+            // x = sqrt(betweenDistance^2 - (y - center.y)^2) + center.x
+            let x = Math.sqrt(Math.pow(betweenDistance, 2) - Math.pow(y - center.y, 2)) + center.x
+            // flip coin (true or false have the same chances)
+            x = Math.round(Math.random()) == 0 ? x : -x
+            planet.getNode().position.set(center.x + x, center.y - y, center.z)
         }
     }
     /**
