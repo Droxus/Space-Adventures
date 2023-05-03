@@ -21,10 +21,10 @@ export class Game {
     /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
     private animationRequestId: any;
     /** tells the game loop whether its scene needs to be re-rendered (true) or not */
-    private needRender: boolean;
+    public static needRender: boolean;
     constructor() {
         this.state = StateFlag.NONE;
-        this.needRender = false;
+        Game.needRender = false;
         this.domElement = document.querySelector('#canvas') as HTMLCanvasElement;
         this.controls = Factory.createControls();
         this.view = Factory.createView({ domElement: this.domElement, controls: this.controls });
@@ -60,7 +60,7 @@ export class Game {
         this.world.getMainGroup().add(box);
         box.getNode().position.set(5, 5, 0)
         this.controls.getCamera().position.z = 200;
-        this.needRender = true;
+        Game.needRender = true;
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
         let starSize = 5 + Math.ceil(Math.random() * 5)
@@ -119,12 +119,12 @@ export class Game {
         const needResize = this.domElement.width !== width || this.domElement.height !== height;
         needResize && this.view.setSize({ width, height });
         needResize && this.controls.update({ viewport: { width, height } });
-        this.needRender = needResize;
+        Game.needRender = needResize;
         this._render();
     }
     private _render(): void {
-        this.needRender && this.view.render(this.world);
-        this.needRender = false;
+        Game.needRender && this.view.render(this.world);
+        Game.needRender = false;
     }
     /**
      * Tries rendering the scene if there was any changes.
