@@ -61,6 +61,7 @@ export class Game {
         box.getNode().position.set(5, 5, 0)
         this.controls.getCamera().position.z = 10;
         this.needRender = true;
+        // comments
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
         // mother star creating
