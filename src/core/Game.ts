@@ -21,12 +21,12 @@ export class Game {
     /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
     private animationRequestId: any;
     /** tells the game loop whether its scene needs to be re-rendered (true) or not */
-    public static needRender: boolean;
+    private needRender: boolean;
     constructor() {
         this.state = StateFlag.NONE;
-        Game.needRender = false;
+        this.needRender = false;
         this.domElement = document.querySelector('#canvas') as HTMLCanvasElement;
-        this.controls = Factory.createControls();
+        this.controls = Factory.createControls({ domElement: this.domElement });
         this.view = Factory.createView({ domElement: this.domElement, controls: this.controls });
         this.world = Factory.createWorld();
         this.domElementSizeObserver = new ResizeObserver(this._onDomElementSizeChanged.bind(this));
@@ -39,12 +39,14 @@ export class Game {
         this._initScene();
         this._observeDomElementSizeChange();
         this._animate();
+        this.controls.addListener(this._onControlsChange.bind(this));
     }
     /**
      * Ends the game by terminating its animation process, disposing the game resources, etc.
      */
     public end(): void {
         this.state = StateFlag.ENDED;
+        this.controls.removeListener(this._onControlsChange.bind(this));
         this._disanimate();
         this._unobserveDomElementSizeChange();
         this._destroyScene();
@@ -60,7 +62,7 @@ export class Game {
         this.world.getMainGroup().add(box);
         box.getNode().position.set(5, 5, 0)
         this.controls.getCamera().position.z = 200;
-        Game.needRender = true;
+        this.needRender = true;
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
         let starSize = 5 + Math.ceil(Math.random() * 5)
@@ -119,12 +121,12 @@ export class Game {
         const needResize = this.domElement.width !== width || this.domElement.height !== height;
         needResize && this.view.setSize({ width, height });
         needResize && this.controls.update({ viewport: { width, height } });
-        Game.needRender = needResize;
+        this.needRender = needResize;
         this._render();
     }
     private _render(): void {
-        Game.needRender && this.view.render(this.world);
-        Game.needRender = false;
+        this.needRender && this.view.render(this.world);
+        this.needRender = false;
     }
     /**
      * Tries rendering the scene if there was any changes.
@@ -136,5 +138,8 @@ export class Game {
     }
     private _disanimate(): void {
         this.animationRequestId && cancelAnimationFrame(this.animationRequestId);
+    }
+    private _onControlsChange(): void {
+        this.needRender = true;
     }
 }

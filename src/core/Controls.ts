@@ -1,19 +1,37 @@
 import * as THREE from "three";
-import { Game } from "./Game";
+
 /**
  * An instance of this class perceives a user's actions within the game,
  * and controls the game input.
  */
 export class Controls {
-    private static camera: THREE.PerspectiveCamera;
-    public static controls: any;
-    public static euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
-    public constructor() {
-        Controls.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        Controls.createControls()
+    private camera: THREE.PerspectiveCamera;
+    private cameraSpeed: number;
+    private sensitivity: number;
+    private readonly euler: THREE.Euler;
+    private readonly listeners: Set<() => any>;
+    private readonly keydowns: Map<string, () => any>
+    public constructor(params: { domElement: HTMLCanvasElement }) {
+        const { domElement } = params;
+        this.camera = new THREE.PerspectiveCamera(75, domElement.width / domElement.height, 0.1, 1000);
+        this.listeners = new Set();
+        this.euler = new THREE.Euler(0, 0, 0, 'YXZ');
+        this.cameraSpeed = 10;
+        this.sensitivity = 1;
+        this.keydowns = new Map([
+            ['KeyW', () => this._translateCameraTo({ z: -this.cameraSpeed })],
+            ['KeyA', () => this._translateCameraTo({ x: -this.cameraSpeed })],
+            ['KeyS', () => this._translateCameraTo({ z: this.cameraSpeed })],
+            ['KeyD', () => this._translateCameraTo({ x: this.cameraSpeed })],
+            ['Space', () => this._translateCameraTo({ y: this.cameraSpeed })],
+            ['ShiftLeft', () => this._translateCameraTo({ y: -this.cameraSpeed })],
+        ]);
+        domElement.addEventListener('click', this._onClick.bind(this), false);
+        domElement.addEventListener('mousemove', this._onMouseMove.bind(this), false);
+        window.addEventListener('keydown', this._onKeyDown.bind(this), false);
     }
     public getCamera(): THREE.Camera {
-        return Controls.camera;
+        return this.camera;
     }
     /**
      * Update this controls within the {@link context} specified.
@@ -21,55 +39,64 @@ export class Controls {
      */
     public update(context: { viewport: { width: number, height: number } }): void {
         const { width, height } = context.viewport;
-        Controls.camera.aspect = width / height;
-        Controls.camera.updateProjectionMatrix();
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
     }
-    public static createControls(): void {
-        let speed = 10, sensitivity = 1
-        // flyControls for comfortable devloping   
-        let canvas = document.querySelector('#canvas') as HTMLCanvasElement;
-          const canvasClick = () => {
-            canvas.requestPointerLock();
-          };
-          
-          document.addEventListener('pointerlockchange', () => {console.log('sam loh')}, false);
-          canvas.addEventListener('click', canvasClick, false);
-          
-          canvas.addEventListener("mousemove", (event: any) => {
-            console.log('asd')
-            const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-        
-            Controls.euler.x -= movementY / (1 / sensitivity * 1000)
-            Controls. euler.y -= movementX / (1 / sensitivity * 1000) 
-        
-            Controls.euler.x = Math.max(Math.min(Math.PI/2, Controls.euler.x), -Math.PI/2)
-            Controls.camera.quaternion.setFromEuler( Controls.euler );
-            Game.needRender = true
-        });
-        window.addEventListener('keydown', (event) => {
-            console.log(event.code)
-            switch (event.code) {
-                case 'KeyW':
-                        Controls.camera.translateZ(-speed)
-                    break;
-                case 'KeyA':
-                        Controls.camera.translateX(-speed)
-                    break;
-                case 'KeyS':
-                        Controls.camera.translateZ(speed)
-                    break;
-                case 'KeyD':
-                        Controls.camera.translateX(speed)
-                    break;
-                case 'Space':
-                        Controls.camera.translateY(speed)
-                    break;
-                case 'ShiftLeft':
-                        Controls.camera.translateY(-speed)
-                    break;
-            }
-            Game.needRender = true
-        })
+    private _translateCameraTo(params: Partial<{ x: number, y: number, z: number }>): void {
+        const { x, y, z } = params;
+        if (x) this.camera.translateX(x);
+        if (y) this.camera.translateY(y);
+        if (z) this.camera.translateZ(z);
+    }
+    private _onClick(event: MouseEvent): void {
+        (event.target as HTMLElement).requestPointerLock();
+    }
+    private _onKeyDown(event: KeyboardEvent): void {
+        if (!this.keydowns.has(event.code)) return;
+        const processThisEventCode = this.keydowns.get(event.code);
+        if (processThisEventCode) processThisEventCode();
+        this.fireListeners(event.type);
+    }
+    private _onMouseMove(event: MouseEvent): void {
+        const movementX = event.movementX || (event as any).mozMovementX || (event as any).webkitMovementX || 0;
+        const movementY = event.movementY || (event as any).mozMovementY || (event as any).webkitMovementY || 0;
+
+        this.euler.x -= movementY / (1 / this.sensitivity * 1000)
+        this.euler.x = Math.max(Math.min(Math.PI / 2, this.euler.x), -Math.PI / 2)
+        this.euler.y -= movementX / (1 / this.sensitivity * 1000)
+
+        this.camera.quaternion.setFromEuler(this.euler.clone());
+
+        this.fireListeners(event.type)
+    }
+    /**
+     * @todo implement {@link eventType}
+     *
+     * Call the callback received in the addListener(callback) method of this class,
+     * which would make the Game class's instance to re-render its scene
+     * @param eventType an event type what listeners to get fired by
+     */
+    protected fireListeners(eventType?: string): void {
+        this.listeners.forEach(callback => callback());
+    }
+    /**
+     * @todo implement {@link eventType}
+     *
+     * Add a function that needs to be called whenever these controls are changed
+     * @param callback a function to call when an event occurs on these controls
+     * @param eventType an event type what listeners to get fired by
+     */
+    public addListener(callback: (...args: any) => any, eventType?: string): void {
+        this.listeners.add(callback);
+    }
+    /**
+     * @todo implement {@link eventType}
+     *
+     * Remove a function that no longer needs to be called whenever these controls are changed
+     * @param callback a function to stop calling when an event occurs on these controls
+     * @param eventType an event type what listeners to get fired by
+     */
+    public removeListener(callback: () => void, eventType?: string): void {
+        this.listeners.delete(callback);
     }
 }
