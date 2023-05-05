@@ -26,7 +26,7 @@ export class Game {
         this.state = StateFlag.NONE;
         this.needRender = false;
         this.domElement = document.querySelector('#canvas') as HTMLCanvasElement;
-        this.controls = Factory.createControls();
+        this.controls = Factory.createControls({ domElement: this.domElement });
         this.view = Factory.createView({ domElement: this.domElement, controls: this.controls });
         this.world = Factory.createWorld();
         this.domElementSizeObserver = new ResizeObserver(this._onDomElementSizeChanged.bind(this));
@@ -39,12 +39,14 @@ export class Game {
         this._initScene();
         this._observeDomElementSizeChange();
         this._animate();
+        this.controls.addListener(this._onControlsChange.bind(this));
     }
     /**
      * Ends the game by terminating its animation process, disposing the game resources, etc.
      */
     public end(): void {
         this.state = StateFlag.ENDED;
+        this.controls.removeListener(this._onControlsChange.bind(this));
         this._disanimate();
         this._unobserveDomElementSizeChange();
         this._destroyScene();
@@ -136,5 +138,8 @@ export class Game {
     }
     private _disanimate(): void {
         this.animationRequestId && cancelAnimationFrame(this.animationRequestId);
+    }
+    private _onControlsChange(): void {
+        this.needRender = true;
     }
 }
