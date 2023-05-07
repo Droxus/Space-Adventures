@@ -21,7 +21,7 @@ export class Game {
     /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
     private animationRequestId: any;
     /** tells the game loop whether its scene needs to be re-rendered (true) or not */
-    public static needRender: boolean;
+    private static needRender: boolean;
     constructor() {
         this.state = StateFlag.NONE;
         Game.needRender = false;
@@ -49,6 +49,9 @@ export class Game {
         this._unobserveDomElementSizeChange();
         this._destroyScene();
     }
+    public static makeRender(){
+        Game.needRender = true;
+    }
     /**
      * This game's initial setup of the scene graph.
      */
@@ -60,18 +63,18 @@ export class Game {
         this.world.getMainGroup().add(box);
         box.getNode().position.set(5, 5, 0)
         this.controls.getCamera().position.z = 200;
-        Game.needRender = true;
+        Game.makeRender()
     }
     private _createPlanetarySystem(center: {x: number, y: number, z: number}, planetsNumber: number): void {
         let starSize = 5 + Math.ceil(Math.random() * 5)
         // mother star creating
-        const star = Factory.createSphere({ geometry: { radius: starSize, width: 32, height: 16 }, material: { color: 0xfff000 } })
+        const star = Factory.createSphere({ geometry: { radius: starSize, width: 64, height: 32 }, material: { color: 0xfff000 } })
         this.world.getMainGroup().add(star);
         star.getNode().position.set(center.x, center.y, center.z)
         // creating planets
         for (let i = 0; i < planetsNumber; i++){
             let planetSize = Math.ceil(Math.random() * 4)
-            const planet = Factory.createSphere({ geometry: { radius: planetSize, width: 32, height: 16 }, material: { color: 0xffff0 } })
+            const planet = Factory.createSphere({ geometry: { radius: planetSize, width: 64, height: 32 }, material: { color: 0xffff0 } })
             this.world.getMainGroup().add(planet);
             let betweenRandom = 10 + Math.ceil(Math.random() * 4)
             let betweenDistance = i * (2 * betweenRandom + (starSize + planetSize) * 2)
