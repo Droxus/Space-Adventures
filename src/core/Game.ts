@@ -15,7 +15,8 @@ export class Game {
     private controls: Controls;
     private view: View;
     private world: World;
-    private state: StateFlag
+    private state: StateFlag;
+    public static deltaTime: any;
     /** holds a reference to a listener of the {@link domElement} size change events */
     private domElementSizeObserver: ResizeObserver;
     /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
@@ -50,7 +51,7 @@ export class Game {
         this._destroyScene();
     }
     public static makeRender(){
-        Game.needRender = true;
+        return Game.needRender = true;
     }
     /**
      * This game's initial setup of the scene graph.
@@ -135,6 +136,8 @@ export class Game {
      */
     private _animate(): void {
         this._render();
+        Game.deltaTime = View.clock.getDelta();
+        Controls.makeObjectMove({obj: this.controls.getCamera(), diffPosition: Controls.cameraSpeed})
         this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
     }
     private _disanimate(): void {

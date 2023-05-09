@@ -9,13 +9,13 @@ export class Controls {
     private static camera: THREE.PerspectiveCamera;
     public static controls: any;
     public static euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
-    private static controlsSpeed: number = 10;
-    static sensitivity: number = 1;
-    private static canvas: HTMLCanvasElement = (document.querySelector('#canvas') as HTMLCanvasElement)
+    private static controlsSpeed: number = 150;
+    private static sensitivity: number = 1;
+    private static canvas: HTMLCanvasElement = (document.querySelector('#canvas') as HTMLCanvasElement);
+    public static cameraSpeed = {x: 0, y: 0, z: 0};
     public constructor() {
         Controls.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         Controls.createControls()
-        // Controls.controlsSpeed = 10;
     }
     public getCamera(): THREE.Camera {
         return Controls.camera;
@@ -37,15 +37,24 @@ export class Controls {
         document.addEventListener('pointerlockchange', () => {console.log('Pointer has been changed')}, false);
         Controls.canvas.addEventListener('click', Controls._onDomElementClick);
         window.addEventListener('keydown', this._onKeyDown)
+        window.addEventListener('keyup', this._onKeyUp)
         Controls.canvas.addEventListener('mousemove', this._onMouseMove)
     }
     private static keydowns = new Map([
-        ['KeyW', () => Controls.translateCameraTo({ z: -Controls.controlsSpeed})],
-        ['KeyA', () => Controls.translateCameraTo({ x: -Controls.controlsSpeed})],
-        ['KeyS', () => Controls.translateCameraTo({ z: Controls.controlsSpeed})],
-        ['KeyD', () => Controls.translateCameraTo({ x: Controls.controlsSpeed})],
-        ['Space', () => Controls.translateCameraTo({ y: Controls.controlsSpeed})],
-        ['ShiftLeft', () => Controls.translateCameraTo({ y: -Controls.controlsSpeed})],
+        ['KeyW', () => Controls.cameraSpeed.z = -1],
+        ['KeyA', () => Controls.cameraSpeed.x = -1],
+        ['KeyS', () => Controls.cameraSpeed.z = 1],
+        ['KeyD', () => Controls.cameraSpeed.x = 1],
+        ['Space', () => Controls.cameraSpeed.y = 1],
+        ['ShiftLeft', () => Controls.cameraSpeed.y = -1],
+    ]);
+    private static keyup = new Map([
+        ['KeyW', () => Controls.cameraSpeed.z = Math.max(0, Controls.cameraSpeed.z)],
+        ['KeyA', () => Controls.cameraSpeed.x = Math.max(0, Controls.cameraSpeed.x)],
+        ['KeyS', () => Controls.cameraSpeed.z = Math.min(0, Controls.cameraSpeed.z)],
+        ['KeyD', () => Controls.cameraSpeed.x = Math.min(0, Controls.cameraSpeed.x)],
+        ['Space', () => Controls.cameraSpeed.y = Math.min(0, Controls.cameraSpeed.y)],
+        ['ShiftLeft', () => Controls.cameraSpeed.y = Math.max(0, Controls.cameraSpeed.y)],
     ]);
     private static translateCameraTo(params: Partial<{ x: number, y: number, z: number }>): void {
         const { x, y, z } = params;
@@ -58,7 +67,12 @@ export class Controls {
             const processThisEventCode = Controls.keydowns.get(event.code);
             if (processThisEventCode) processThisEventCode();
         }
-        Controls._fireChangeEvent();
+    }
+    private static _onKeyUp(event: KeyboardEvent): void {
+        if (Controls.keyup.has(event.code)){
+            const processThisEventCode = Controls.keyup.get(event.code);
+            if (processThisEventCode) processThisEventCode();
+        }
     }
     private static _fireChangeEvent(): void {
         Game.makeRender()
@@ -75,5 +89,11 @@ export class Controls {
             Controls.euler.x = Math.max(Math.min(Math.PI/2, Controls.euler.x), -Math.PI/2)
             Controls.camera.quaternion.setFromEuler( Controls.euler );
             Game.makeRender()
+    }
+    public static makeObjectMove(params: {obj: THREE.Object3D, diffPosition: {x: number, y: number, z: number}}){
+        Controls.translateCameraTo({ x: params.diffPosition.x * Controls.controlsSpeed * Game.deltaTime})
+        Controls.translateCameraTo({ y: params.diffPosition.y * Controls.controlsSpeed * Game.deltaTime})
+        Controls.translateCameraTo({ z: params.diffPosition.z * Controls.controlsSpeed * Game.deltaTime})
+        Controls._fireChangeEvent()
     }
 }
