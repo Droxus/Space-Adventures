@@ -67,6 +67,7 @@ export class Controls {
             const processThisEventCode = Controls.keydowns.get(event.code);
             if (processThisEventCode) processThisEventCode();
         }
+        Controls._fireChangeEvent()
     }
     private static _onKeyUp(event: KeyboardEvent): void {
         if (Controls.keyup.has(event.code)){
@@ -94,6 +95,8 @@ export class Controls {
         Controls.translateCameraTo({ x: params.diffPosition.x * Controls.controlsSpeed * Game.deltaTime})
         Controls.translateCameraTo({ y: params.diffPosition.y * Controls.controlsSpeed * Game.deltaTime})
         Controls.translateCameraTo({ z: params.diffPosition.z * Controls.controlsSpeed * Game.deltaTime})
-        Controls._fireChangeEvent()
+        if (params.diffPosition.x || params.diffPosition.y || params.diffPosition.z){
+            Controls._fireChangeEvent()
+        }
     }
 }
