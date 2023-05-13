@@ -73,7 +73,6 @@ export class Game {
     this._createPlanetarySystem({ x: 0, y: 0, z: 0 }, 5);
     this.world.getMainGroup().add(box);
     box.getNode().position.set(5, 5, 0);
-    // comfortable poisition - not magic number
     this.controls.getCamera().position.z = 200;
     this.needRender = true;
   }
