@@ -164,7 +164,7 @@ export class Game {
    */
   private _animate(): void {
     this._render();
-    this.controls.translateCameraTo(this.controls.cameraSpeed);
+    this.controls.translateCamera(this.controls.cameraSpeed);
     this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
   }
   private _disanimate(): void {

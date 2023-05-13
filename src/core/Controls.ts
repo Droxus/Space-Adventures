@@ -65,7 +65,7 @@ export class Controls {
     ["Space", () => (this.cameraSpeed.y = Math.min(0, this.cameraSpeed.y))],
     ["ShiftLeft", () => (this.cameraSpeed.y = Math.max(0, this.cameraSpeed.y))],
   ]);
-  public translateCameraTo(
+  public translateCamera(
     params: Partial<{ x: number; y: number; z: number }>
   ): void {
     const { x, y, z } = params;
