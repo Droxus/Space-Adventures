@@ -89,7 +89,7 @@ export class Game {
     this.world.getMainGroup().add(star);
     star.getNode().position.set(center.x, center.y, center.z);
     // creating planets
-    for (let i = 0; i < planetsNumber; i++) {
+    for (let i = 1; i <= planetsNumber; i++) {
       let planetSize = Math.ceil(Math.random() * 4);
       const planet = Factory.createSphere({
         geometry: { radius: planetSize, width: 64, height: 32 },
@@ -98,7 +98,7 @@ export class Game {
       this.world.getMainGroup().add(planet);
       let betweenRandom = 10 + Math.ceil(Math.random() * 4);
       let betweenDistance =
-        (i+1) * (2 * betweenRandom + (starSize + planetSize) * 2);
+        i * (2 * betweenRandom + (starSize + planetSize) * 2);
       let y = betweenDistance * (Math.random() - 0.5) * 2;
       // (x - center.x)^2 + (y - center.y)^2 = betweenDistance^2
       // x = sqrt(betweenDistance^2 - (y - center.y)^2) + center.x
