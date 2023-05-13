@@ -64,17 +64,17 @@ export class Game {
    * This game's initial setup of the scene graph.
    */
   private _initScene(): void {
-    const boxGeometry = { width: 1, height: 1, depth: 1 };
-    const boxMaterial = { color: 0x00ff00 };
-    const box = Factory.createBox({
-      geometry: boxGeometry,
-      material: boxMaterial,
-    });
     this._createPlanetarySystem({ x: 0, y: 0, z: 0 }, 5);
-    this.world.getMainGroup().add(box);
-    box.getNode().position.set(5, 5, 0);
+    this._spawnCharacters(2);
     this.controls.getCamera().position.z = 200;
     this.needRender = true;
+  }
+  private _spawnCharacters(count: number): void {
+    const moveFactor = 5;
+    new Array(count)
+      .map(_ => Factory.createCharacter())
+      .map(char => char.moveTo({x: Math.random() * moveFactor, y: Math.random() * moveFactor, z: Math.random() * moveFactor}))
+      .forEach(this.world.getMainGroup().add.bind(this));
   }
   private _createPlanetarySystem(
     center: { x: number; y: number; z: number },

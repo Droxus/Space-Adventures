@@ -53,9 +53,10 @@ export class Factory {
     public static createGame(): Game {
         return new Game();
     }
-    public static createCharacter(params: { name: string }): Character {
+    public static createCharacter(params: Partial<{ name: string }> = {}): Character {
         const { name } = params;
-        const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
+        const sizeFactor = 10;
+        const geometry = new THREE.BoxGeometry(sizeFactor,sizeFactor,sizeFactor); 
         const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
         const node = new THREE.Mesh(geometry, material);
         return new Character({ node, name });

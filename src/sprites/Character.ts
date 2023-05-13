@@ -1,18 +1,19 @@
-import { generateUUID } from "three/src/math/MathUtils.js";
+import { v4 as uuidv4 } from 'uuid';
 import { Graphic } from "../core/Graphic";
 
 export class Character extends Graphic {
     private name: string;
-    constructor(params?: { name: string, node?: THREE.Object3D, material?: THREE.Material; geometry?: THREE.BufferGeometry }) {
+    constructor(params?: { name?: string, node?: THREE.Object3D, material?: THREE.Material; geometry?: THREE.BufferGeometry }) {
         super(params);
-        this.name = params?.name ?? generateUUID();
+        this.name = params?.name ?? uuidv4();
     }
     public getName(): string {
         return this.name;
     }
-    public moveTo(position: { x: number, y: number, z: number }): void {
+    public moveTo(position: { x: number, y: number, z: number }): Character {
         const { x, y, z } = position;
         this.getNode().position.set(x, y, z);
+        return this;
     }
     public rotateIn(rotation: { x: number, y: number, z: number }): void {
         const { x, y, z } = rotation;
