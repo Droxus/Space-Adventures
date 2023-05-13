@@ -73,6 +73,7 @@ export class Game {
     this._createPlanetarySystem({ x: 0, y: 0, z: 0 }, 5);
     this.world.getMainGroup().add(box);
     box.getNode().position.set(5, 5, 0);
+    // comfortable poisition - not magic number
     this.controls.getCamera().position.z = 200;
     this.needRender = true;
   }
@@ -80,35 +81,44 @@ export class Game {
     center: { x: number; y: number; z: number },
     planetsNumber: number
   ): void {
-    let starSize = 5 + Math.ceil(Math.random() * 5);
+    let minimumStarSize = 5;
+    let sumRandomSizeFactor = 5;
+    let starSize = minimumStarSize + Math.ceil(Math.random() * sumRandomSizeFactor);
     // mother star creating
+    let sphereMaxWidthSegments = 64;
+    let sphereMaxHeightSegments = 32;
+    let starMaterialColor = 'yellow'
     const star = Factory.createSphere({
-      geometry: { radius: starSize, width: 64, height: 32 },
-      material: { color: 0xfff000 },
+      geometry: { radius: starSize, width: sphereMaxWidthSegments, height: sphereMaxHeightSegments },
+      material: { color: starMaterialColor },
     });
     this.world.getMainGroup().add(star);
     star.getNode().position.set(center.x, center.y, center.z);
     // creating planets
     for (let i = 1; i <= planetsNumber; i++) {
-        let planetSizeLimit = 4
-        let planetSize = Math.ceil(Math.random() * planetSizeLimit);
+        let planetSizeRadiusLimit = 4;
+        let planetSizeLimit = planetSizeRadiusLimit * 2;
+        let planetSize = Math.ceil(Math.random() * planetSizeRadiusLimit);
+        let planetMaterialColor = 'aqua'
         const planet = Factory.createSphere({
-            geometry: { radius: planetSize, width: 64, height: 32 },
-            material: { color: 0xffff0 },
+            geometry: { radius: planetSize, width: sphereMaxWidthSegments, height: sphereMaxHeightSegments },
+            material: { color: planetMaterialColor },
         });
         this.world.getMainGroup().add(planet);
-        let betweenRandom = 10 + Math.ceil(Math.random() * planetSizeLimit);
-        let betweenDistance =
-            i * (2 * betweenRandom + (starSize + planetSize) * 2);
-        let y = betweenDistance * (Math.random() - 0.5) * 2;
+        let betweenFactor = planetSizeLimit;
+        let sizeOfTwoPlanets = betweenFactor * 2;
+        let betweenRandom = sizeOfTwoPlanets + Math.ceil(Math.random() * sizeOfTwoPlanets);
+        let betweenDistance = i * (betweenRandom + (starSize + planetSize));
+        // 0.5 because it's average of Math.random interval [0; 1)
+        // 2 because to get random num from interval (-1; 1)
+        let randomYfactor = (Math.random() - 0.5) * 2
+        let y = betweenDistance * randomYfactor;
         // (x - center.x)^2 + (y - center.y)^2 = betweenDistance^2
         // x = sqrt(betweenDistance^2 - (y - center.y)^2) + center.x
-        let x =
-            Math.sqrt(Math.pow(betweenDistance, 2) - Math.pow(y - center.y, 2)) +
-            center.x;
+        let x = Math.sqrt(Math.pow(betweenDistance, 2) - Math.pow(y - center.y, 2)) + center.x;
         // flip coin (true or false have the same chances)
         x = Math.round(Math.random()) == 0 ? x : -x;
-        planet.getNode().position.set(center.x + x, center.y - y, center.z);
+        planet.getNode().position.set(center.x + x, center.y + y, center.z);
     }
   }
   /**
