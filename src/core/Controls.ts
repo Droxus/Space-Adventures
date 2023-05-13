@@ -10,12 +10,10 @@ export class Controls {
   private euler: THREE.Euler;
   private controlsSpeed: number;
   private sensitivity: number;
-  private canvas: HTMLCanvasElement = document.querySelector(
-    "#canvas"
-  ) as HTMLCanvasElement;
+  private canvas: HTMLCanvasElement;
   public cameraSpeed: THREE.Vector3;
   private listeners: ListenerType[] = [];
-  public constructor() {
+  public constructor(params: {canvas: HTMLCanvasElement}) {
     this.camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
@@ -26,6 +24,7 @@ export class Controls {
     this.controlsSpeed = 1;
     this.sensitivity = 1000;
     this.cameraSpeed = new THREE.Vector3(0, 0, 0);
+    this.canvas = params.canvas;
     this.createControls();
   }
   public getCamera(): THREE.Camera {

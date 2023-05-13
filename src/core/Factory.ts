@@ -21,8 +21,8 @@ export class Factory {
     public static createView(props: { domElement?: HTMLElement, controls: Controls}): View {
         return new View(props);
     }
-    public static createControls(): Controls {
-        return new Controls();
+    public static createControls(params: { canvas: HTMLCanvasElement }): Controls {
+        return new Controls(params);
     }
     public static createBox(params: { material: { color: string | number }; geometry: {width: number, height: number, depth: number} }): Graphic {
         const { material: { color }, geometry: { width, height, depth }} = params;

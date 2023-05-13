@@ -26,7 +26,7 @@ export class Game {
     this.state = StateFlag.NONE;
     this.needRender = false;
     this.domElement = document.querySelector("#canvas") as HTMLCanvasElement;
-    this.controls = Factory.createControls();
+    this.controls = Factory.createControls({ canvas: this.domElement });
     this.view = Factory.createView({
       domElement: this.domElement,
       controls: this.controls,
