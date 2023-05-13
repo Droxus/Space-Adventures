@@ -82,8 +82,8 @@ export class Game {
     planetsNumber: number
   ): void {
     let minimumStarSize = 5;
-    let sumRandomSizeFactor = 5;
-    let starSize = minimumStarSize + Math.ceil(Math.random() * sumRandomSizeFactor);
+    let sunRandomSizeFactor = 5;
+    let starSize = minimumStarSize + Math.ceil(Math.random() * sunRandomSizeFactor);
     // mother star creating
     let sphereMaxWidthSegments = 64;
     let sphereMaxHeightSegments = 32;
