@@ -137,7 +137,7 @@ export class Game {
     private _animate(): void {
         this._render();
         Game.deltaTime = View.clock.getDelta();
-        Controls.makeObjectMove({obj: this.controls.getCamera(), diffPosition: Controls.cameraSpeed})
+        this.controls.makeObjectMove({obj: this.controls.getCamera(), diffPosition: this.controls.cameraSpeed})
         this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
     }
     private _disanimate(): void {
