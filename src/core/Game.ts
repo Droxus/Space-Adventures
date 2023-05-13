@@ -98,7 +98,7 @@ export class Game {
       this.world.getMainGroup().add(planet);
       let betweenRandom = 10 + Math.ceil(Math.random() * 4);
       let betweenDistance =
-        i * (2 * betweenRandom + (starSize + planetSize) * 2);
+        (i+1) * (2 * betweenRandom + (starSize + planetSize) * 2);
       let y = betweenDistance * (Math.random() - 0.5) * 2;
       // (x - center.x)^2 + (y - center.y)^2 = betweenDistance^2
       // x = sqrt(betweenDistance^2 - (y - center.y)^2) + center.x
