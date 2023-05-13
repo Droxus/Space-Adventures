@@ -16,7 +16,6 @@ export class Game {
     private view: View;
     private world: World;
     private state: StateFlag;
-    public static deltaTime: any;
     /** holds a reference to a listener of the {@link domElement} size change events */
     private domElementSizeObserver: ResizeObserver;
     /** {@link requestAnimationFrame} request ID to use with {@link cancelAnimationFrame} */
@@ -136,7 +135,6 @@ export class Game {
      */
     private _animate(): void {
         this._render();
-        Game.deltaTime = View.clock.getDelta();
         this.controls.makeObjectMove({obj: this.controls.getCamera(), diffPosition: this.controls.cameraSpeed})
         this.animationRequestId = requestAnimationFrame(this._animate.bind(this));
     }

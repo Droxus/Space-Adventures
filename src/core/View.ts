@@ -6,13 +6,11 @@ import { Graphic } from "./Graphic";
 export class View {
     private renderer: THREE.WebGLRenderer;
     private controls: Controls;
-    public static clock: THREE.Clock;
     constructor(params: { domElement?: HTMLElement, controls: Controls }) {
         let { domElement, controls } = params;
         this.controls = controls;
         domElement ??= document.body.appendChild(document.createElement('canvas'));
         this.renderer = new THREE.WebGLRenderer({ canvas: domElement });
-        View.clock = new THREE.Clock();
     }
     /**
      * Access the DOM element used to render the graph scene image to
