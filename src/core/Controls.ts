@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Game } from "./Game";
 /**
  * An instance of this class perceives a user's actions within the game,
  * and this the game input.
