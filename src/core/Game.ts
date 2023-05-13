@@ -64,15 +64,8 @@ export class Game {
    * This game's initial setup of the scene graph.
    */
   private _initScene(): void {
-    const boxGeometry = { width: 1, height: 1, depth: 1 };
-    const boxMaterial = { color: 0x00ff00 };
-    const box = Factory.createBox({
-      geometry: boxGeometry,
-      material: boxMaterial,
-    });
     this._createPlanetarySystem({ x: 0, y: 0, z: 0 }, 5);
-    this.world.getMainGroup().add(box);
-    box.getNode().position.set(5, 5, 0);
+    this._spawnShip();
     this.controls.getCamera().position.z = 200;
     this.needRender = true;
   }
@@ -170,4 +163,10 @@ export class Game {
   private _disanimate(): void {
     this.animationRequestId && cancelAnimationFrame(this.animationRequestId);
   }
+  private _spawnShip(factor: number = 100) {
+    const ship = Factory.createVehicle({ size: 20 });
+    this.world.getMainGroup().add(ship);
+    const [x,y,z] = Array.from(new Array(3), _ => Math.random() * factor);
+    ship.moveTo({x, y, z});
+}
 }
