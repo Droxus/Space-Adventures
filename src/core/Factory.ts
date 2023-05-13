@@ -5,6 +5,7 @@ import { View } from "./View";
 import { Group } from "./Group";
 import { World } from "./World";
 import { Game } from "./Game";
+import { Character } from "../sprites/Character";
 
 /**
  * This class knows how to create an object of almost any type in the game.
@@ -51,5 +52,12 @@ export class Factory {
      */
     public static createGame(): Game {
         return new Game();
+    }
+    public static createCharacter(params: { name: string }): Character {
+        const { name } = params;
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const node = new THREE.Mesh(geometry, material);
+        return new Character({ node, name });
     }
 }
